@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "*"
+beautifulsoup4 = "*"
+selenium = "*"
+webdriver-manager = "*"
+pyscreenshot = "*"
+pillow = "*"
+pytesseract = "*"
+opencv-python = "*"
+imutils = "*"
+alive-progress = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
