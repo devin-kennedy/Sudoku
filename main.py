@@ -37,8 +37,10 @@ class Sudoku:
             for c in line:
                 if c is not None:
                     out_string += str(c)
+                    out_string += " "
                 else:
-                    out_string += "."
+                    out_string += "□"
+                    out_string += " "
             out_string += "\n"
         return out_string
 

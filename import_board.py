@@ -62,7 +62,7 @@ for (i, c) in enumerate(cnts, 1):
 
 whitelist = [str(i) for i in range(1, 10)]
 out = []
-with alive_bar(81) as bar:
+with alive_bar(81, title="Analyzing...") as bar:
     for row in sudoku_rows:
         for c in row:
             mask = np.zeros(image.shape, dtype=np.uint8)
@@ -88,7 +88,11 @@ for row in shaped:
         board += cell
     board += "\n"
 
+print("\nBoard to solve:")
+print(Sudoku(board), "\n")
+
 parsed_board = Sudoku(board)
 parsed_board.solve()
 
+print("Solved board:")
 print(parsed_board)
