@@ -69,10 +69,13 @@ with alive_bar(81, title="Analyzing...") as bar:
             cv.drawContours(mask, [c], -1, (255, 255, 255), -1)
             result = cv.bitwise_and(image, mask)
             result[mask==0] = 255
-            config = r'--oem 3 --psm 10'
-            num = pytesseract.image_to_string(result, lang="eng", config=config)
-            num = num.split("\n")[0]
-            if num in whitelist:
+
+            # Check if there are any black pixels. If there are, perform OCR
+            black = np.sum(result == 0)
+            if black > 0:
+                config = r'--oem 3 --psm 10'
+                num = pytesseract.image_to_string(result, lang="eng", config=config)
+                num = num.split("\n")[0]
                 out.append(num)
             else:
                 out.append(".")
