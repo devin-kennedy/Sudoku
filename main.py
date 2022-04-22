@@ -100,21 +100,23 @@ class Sudoku:
 
 def main():
     board = \
-        """...4.5...
-..9.6..8.
-5....8.74
-...3962..
-.321.74.6
-1.6.84...
-.8..72531
-.57.3..4.
-6.354..2."""
+        """..3.549..
+.1.6....2
+.......5.
+..24...6.
+59..6...4
+7...38.2.
+...3....6
+.....658.
+..68...43"""
 
     t_board = Sudoku(board)
 
     print(t_board)
     t_board.solve()
     print(t_board)
+    for i in range(9):
+        print(t_board.board[i])
 
 
 if __name__ == "__main__":

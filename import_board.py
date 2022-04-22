@@ -12,9 +12,7 @@ from alive_progress import alive_bar
 import argparse
 
 argParser = argparse.ArgumentParser()
-
 argParser.add_argument('-s', '--saved', action="store_false", help="Use saved board")
-
 args = argParser.parse_args()
 
 if args.saved:
@@ -30,6 +28,7 @@ if args.saved:
 image = cv.imread("screen.png")
 gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 thresh = cv.adaptiveThreshold(gray, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 57, 5)
+font = cv.FONT_HERSHEY_SIMPLEX
 
 cnts = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 cnts = cnts[0] if len(cnts) == 2 else cnts[1]
@@ -62,13 +61,14 @@ for (i, c) in enumerate(cnts, 1):
 
 whitelist = [str(i) for i in range(1, 10)]
 out = []
+allCells = []
 with alive_bar(81, title="Analyzing...") as bar:
     for row in sudoku_rows:
         for c in row:
             mask = np.zeros(image.shape, dtype=np.uint8)
             cv.drawContours(mask, [c], -1, (255, 255, 255), -1)
             result = cv.bitwise_and(image, mask)
-            result[mask==0] = 255
+            result[mask == 0] = 255
 
             # Check if there are any black pixels. If there are, perform OCR
             black = np.sum(result == 0)
@@ -77,15 +77,20 @@ with alive_bar(81, title="Analyzing...") as bar:
                 num = pytesseract.image_to_string(result, lang="eng", config=config)
                 num = num.split("\n")[0]
                 out.append(num)
+                allCells.append(None)
             else:
                 out.append(".")
+                M = cv.moments(c)
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                allCells.append([cX, cY])
             bar()
 
 mat = np.array([out])
 shaped = mat[0].reshape((9, 9))
 
 # Parse the array into the solver, then solve
-board = """"""
+board = ""
 for row in shaped:
     for cell in row:
         board += cell
@@ -99,3 +104,16 @@ parsed_board.solve()
 
 print("Solved board:")
 print(parsed_board)
+
+ind = 0
+for i in range(9):
+    for j in range(9):
+        cell = parsed_board.board[i][j]
+        if allCells[ind]:
+            cX = allCells[ind][0]
+            cY = allCells[ind][1]
+            cv.putText(image, str(cell), (cX-5, cY+5), font, 1, (0, 255, 0), 2)
+        ind += 1
+
+cv.imshow("Image", image)
+cv.waitKey()
