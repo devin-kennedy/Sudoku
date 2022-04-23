@@ -10,19 +10,16 @@ import pytesseract
 from main import Sudoku
 from alive_progress import alive_bar
 import argparse
+import util
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument('-s', '--saved', action="store_false", help="Use saved board")
+argParser.add_argument('-w', '--website', help='Declare sudoku website', required=False, default="websudoku")
 args = argParser.parse_args()
 
 if args.saved:
     # Save the board image
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    driver.get("https://www.websudoku.com")
-    sleep(5)
-    img = pyscreenshot.grab(bbox=(615, 425, 920, 730))
-    img.save("screen.png")
-    driver.quit()
+    util.find_board(args.website)
 
 # Parse the board image
 image = cv.imread("screen.png")
