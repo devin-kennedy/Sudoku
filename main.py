@@ -37,10 +37,10 @@ class Sudoku:
             for c in line:
                 if c is not None:
                     out_string += str(c)
-                    out_string += " "
+                    #out_string += " "
                 else:
-                    out_string += "□"
-                    out_string += " "
+                    out_string += "."
+                    #out_string += " "
             out_string += "\n"
         return out_string
 
@@ -79,7 +79,13 @@ class Sudoku:
                     self.changed = True
 
     def reduce_col_poss(self):
-        raise NotImplementedError("TODO")
+        for j in range(9):
+            col_poss = [self.poss(i, j) for i in range(9)]
+            for digit in range(1, 10):
+                poss_cells = [k for k, square in enumerate(col_poss) if digit in square]
+                if len(poss_cells) == 1 and self.board[j][poss_cells[0]] is None:
+                    self.board[j][poss_cells[0]] = digit
+                    self.changed = True
 
     def is_solved(self):
         for i in range(9):
@@ -88,35 +94,74 @@ class Sudoku:
                     return False
         return True
 
-    def solve(self):
+    def is_error(self):
+        for i in range(9):
+            for j in range(9):
+                if len(self.poss(i, j)) == 0:
+                    return True
+            row_digits = [k for k in self.board[i] if k != "."]
+            col_digits = [self.board[k][i] for k in range(9) if self.board[k][i] != "."]
+            if len(row_digits) != len(set(row_digits)):
+                return True
+            if len(col_digits) != len(set(col_digits)):
+                return True
+        return False
+
+    def guess(self):
+        for i in range(9):
+            for j in range(9):
+                if len(self.poss(i, j)) == 2:
+                    i = i
+                    j = j
+                    guess = list(self.poss(i, j))[0]
+                    print(i, j, guess)
+                    break
+            break
+
+        new_board = Sudoku(str(self))
+        new_board.board[i][j] = guess
+        new_board.reduce()
+        print(new_board)
+        if new_board.is_solved() and not new_board.is_error():
+            self.board = new_board.board
+        else:
+            guess = list(self.poss(i, j))[1]
+            self.board[i][j] = guess
+
+    def reduce(self):
         while True:
             self.changed = False
             self.reduce_one_poss()
             self.reduce_row_poss()
+            self.reduce_col_poss()
 
             if not self.changed:
                 break
 
+    def solve(self):
+        self.reduce()
+        self.guess()
+
 
 def main():
     board = \
-        """..3.549..
-.1.6....2
-.......5.
-..24...6.
-59..6...4
-7...38.2.
-...3....6
-.....658.
-..68...43"""
+        """..5....84
+.4.8..25.
+...5..6.3
+3....4.9.
+69...7...
+.......45
+...4...7.
+.8.7...2.
+..3...5.."""
 
     t_board = Sudoku(board)
 
     print(t_board)
     t_board.solve()
     print(t_board)
-    for i in range(9):
-        print(t_board.board[i])
+    print(t_board.is_error())
+    print(t_board.is_solved())
 
 
 if __name__ == "__main__":

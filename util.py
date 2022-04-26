@@ -1,15 +1,16 @@
 import cv2 as cv
+import selenium
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from time import sleep
 import numpy as np
 
 
-def find_board(w):
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    driver.get(f"https://www.{w}.com")
-    driver.save_screenshot("fullscreen.png")
+def find_board(level="1", web=True):
+    if web:
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        driver.get(f"https://www.websudoku.com/?level={level}")
+        driver.save_screenshot("fullscreen.png")
 
     image = cv.imread("fullscreen.png")
     gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -26,4 +27,5 @@ def find_board(w):
     roi = image[y:y + h, x:x + w]
 
     cv.imwrite("screen.png", roi)
-    driver.quit()
+    if web:
+        driver.quit()
