@@ -107,26 +107,28 @@ class Sudoku:
                 return True
         return False
 
-    def guess(self):
+    def find_guess(self):
         for i in range(9):
             for j in range(9):
                 if len(self.poss(i, j)) == 2:
-                    i = i
-                    j = j
-                    guess = list(self.poss(i, j))[0]
-                    print(i, j, guess)
-                    break
-            break
+                    ind = i
+                    j_ind = j
+                    poss = list(self.poss(i, j))
+                    myguess = poss[0]
+                    return ind, j_ind, poss, myguess
 
+    def guess(self):
+        ind, j_ind, poss, myguess = self.find_guess()
+        print(ind, j_ind, poss, myguess)
+        print(self.board[ind][j_ind])
         new_board = Sudoku(str(self))
-        new_board.board[i][j] = guess
         new_board.reduce()
-        print(new_board)
+        new_board.board[ind][j_ind] = myguess
         if new_board.is_solved() and not new_board.is_error():
             self.board = new_board.board
         else:
-            guess = list(self.poss(i, j))[1]
-            self.board[i][j] = guess
+            myguess = poss[1]
+            self.board[ind][j_ind] = myguess
 
     def reduce(self):
         while True:
@@ -140,28 +142,27 @@ class Sudoku:
 
     def solve(self):
         self.reduce()
-        self.guess()
+        if not self.is_solved():
+            self.guess()
 
 
 def main():
     board = \
-        """..5....84
-.4.8..25.
-...5..6.3
-3....4.9.
-69...7...
-.......45
-...4...7.
-.8.7...2.
-..3...5.."""
+        """...769.1.
+..1.3...6
+......42.
+1....65.8
+.........
+3.89....4
+.36......
+4...7.9..
+.1.458..."""
 
     t_board = Sudoku(board)
 
     print(t_board)
     t_board.solve()
     print(t_board)
-    print(t_board.is_error())
-    print(t_board.is_solved())
 
 
 if __name__ == "__main__":

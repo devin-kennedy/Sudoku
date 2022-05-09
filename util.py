@@ -10,6 +10,7 @@ def find_board(level="1", web=True):
     if web:
         driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         driver.get(f"https://www.websudoku.com/?level={level}")
+        #driver.get(f"https://www.sudoku.com/")
         driver.save_screenshot("fullscreen.png")
 
     image = cv.imread("fullscreen.png")

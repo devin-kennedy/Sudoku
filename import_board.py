@@ -65,12 +65,14 @@ def impt_board(saved, level="1"):
                 cv.drawContours(mask, [c], -1, (255, 255, 255), -1)
                 result = cv.bitwise_and(image, mask)
                 result[mask == 0] = 255
+                grayResult = cv.cvtColor(result, cv.COLOR_BGR2GRAY)
+                resThresh = cv.adaptiveThreshold(grayResult, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY_INV, 57 , 5)
 
                 # Check if there are any black pixels. If there are, perform OCR
-                black = np.sum(result == 0)
-                #new_cnts, _ = cv.findContours(result, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+                #black = np.sum(result == 0)
+                new_cnts, _ = cv.findContours(resThresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
-                if black > 0:
+                if len(new_cnts) > 0:
                     config = r'--oem 3 --psm 10'
                     num = pytesseract.image_to_string(result, lang="eng", config=config)
                     num = num.split("\n")[0]
@@ -99,7 +101,7 @@ def impt_board(saved, level="1"):
     print(Sudoku(board), "\n")
 
     parsed_board = Sudoku(board)
-    parsed_board.reduce()
+    parsed_board.solve()
 
     print("Solved board:")
     print(parsed_board)
